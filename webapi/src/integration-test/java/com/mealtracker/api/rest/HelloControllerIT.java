@@ -43,7 +43,7 @@ public class HelloControllerIT {
         response.put("name", name);
         when(helloService.greet(eq(name))).thenReturn(response);
 
-        mockMvc.perform(get("/api/hello/unauth/hung"))
+        mockMvc.perform(get("/v1/hello/unauth/hung"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("{\"name\":\"hung\"}"));
     }
@@ -57,8 +57,8 @@ public class HelloControllerIT {
         when(helloService.greet(eq(name))).thenReturn(response);
 
         mockMvc.perform(
-                get("/api/hello/auth/hung")
-                .header("Authorization", "Bearer <DEV_JWT>")
+                get("/v1/hello/auth/hung")
+                        .header("Authorization", "Bearer <DEV_JWT>")
         )
                 .andExpect(status().isOk())
                 .andExpect(content().string("{\"name\":\"hung\"}"));
