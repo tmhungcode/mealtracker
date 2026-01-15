@@ -2,18 +2,19 @@ package com.mealtracker.repositories;
 
 import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
-import org.assertj.core.api.Assertions;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,17 +24,30 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
+@Testcontainers
+@Tag("integration")
+@Tag("repository")
 public class UserRepositoryIT {
 
-    @ClassRule
-    public static MySQLContainer mySQLContainer = AppDbContainer.getInstance();
-
+    @Container
+    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test")
+            .withEnv("TZ", "UTC");
     @Autowired
     private UserRepository userRepository;
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url",
+                () -> mysql.getJdbcUrl() + "?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC");
+        registry.add("spring.datasource.username", mysql::getUsername);
+        registry.add("spring.datasource.password", mysql::getPassword);
+    }
 
     @Test
     @Sql("classpath:repositories/user/insert_user_2.sql")
@@ -52,7 +66,6 @@ public class UserRepositoryIT {
         assertThat(userRepository.findUserByIdAndDeleted(deletedUser3, true)).isNotEmpty();
         assertThat(userRepository.findUserByIdAndDeleted(deletedUser3, false)).isEmpty();
     }
-
 
     @Test
     @Sql("classpath:repositories/user/insert_user_4.sql")
@@ -74,14 +87,15 @@ public class UserRepositoryIT {
         var users = userRepository.findAll();
 
         assertThat(countDeleteUsers(users)).isEqualTo(2);
-        assertThat(userRepository.getOne(notDeletedUserId).isDeleted()).isFalse();
+        assertThat(userRepository.getReferenceById(notDeletedUserId).isDeleted()).isFalse();
     }
 
     @Test
     @Sql("classpath:repositories/user/insert_user_6.sql")
     @Sql(scripts = "classpath:repositories/delete_users.sql", executionPhase = AFTER_TEST_METHOD)
     public void lookupExistingUsers_ExpectSearchByStartWithEmail() {
-        var users = userRepository.lookupExistingUsers("hel%", Arrays.asList(Role.values()), PageRequest.of(0, 1000)).getContent();
+        var users = userRepository.lookupExistingUsers("hel%", Arrays.asList(Role.values()), PageRequest.of(0, 1000))
+                .getContent();
 
         assertThat(email(users)).containsExactlyInAnyOrder("hello_6@abc.com", "hello7", "hel@abc.com");
     }

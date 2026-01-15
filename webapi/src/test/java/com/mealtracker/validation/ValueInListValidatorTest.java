@@ -1,25 +1,21 @@
 package com.mealtracker.validation;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintValidatorContext;
-
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ValueInListValidatorTest {
-    private final ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);
 
     @Test
     public void isValid_InputInList_ExpectValid() {
-        Assertions.assertThat(validator("ONE", "TWO", "THREE").isValid("TWO", context)).isTrue();
+        Assertions.assertThat(validator("ONE", "TWO", "THREE").isValid("TWO", null)).isTrue();
     }
 
     @Test
     public void isValid_InputNotInList_ExpectInvalid() {
-        Assertions.assertThat(validator("1", "2", "3").isValid("5", context)).isFalse();
+        Assertions.assertThat(validator("1", "2", "3").isValid("5", null)).isFalse();
     }
 
     private ValueInListValidator validator(String... value) {

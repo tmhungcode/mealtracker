@@ -2,7 +2,6 @@ package com.mealtracker.services.usersettings;
 
 import com.mealtracker.domains.UserSettings;
 import com.mealtracker.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,16 +9,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserSettingsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserSettingsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public UserSettings getUserSettings(long userId) {
-        var user = userRepository.getOne(userId);
+        var user = userRepository.getReferenceById(userId);
         return user.getUserSettings();
     }
 
     public UserSettings updateUserSettings(long userId, MySettingsInput input) {
-        var user = userRepository.getOne(userId);
+        var user = userRepository.getReferenceById(userId);
         if (input.isDailyCalorieLimitPatched()) {
             user.getUserSettings().setDailyCalorieLimit(input.getDailyCalorieLimit());
         }

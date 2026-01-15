@@ -1,9 +1,9 @@
 package com.mealtracker.assertions;
 
 import com.mealtracker.exceptions.AppException;
+import jakarta.validation.ConstraintViolation;
 import org.assertj.core.api.ThrowableAssert;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 
 import static com.mealtracker.assertions.AppExceptionAssert.catchThrowable;

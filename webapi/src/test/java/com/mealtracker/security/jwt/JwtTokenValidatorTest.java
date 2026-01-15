@@ -1,10 +1,9 @@
 package com.mealtracker.security.jwt;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

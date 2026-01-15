@@ -1,17 +1,9 @@
 package com.mealtracker.services.session;
 
-import lombok.Data;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-
-@Data
-public class SessionInput {
-
-    @Email
-    @NotNull
-    private String email;
-
-    @NotNull
-    private String password;
+public record SessionInput(
+        @Email @NotNull String email,
+        @NotNull String password) {
 }

@@ -3,7 +3,7 @@ package com.mealtracker.rest;
 import com.mealtracker.config.rest.CurrentUserMethodArgumentResolver;
 import com.mealtracker.security.CurrentUser;
 import com.mealtracker.security.UserPrincipal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

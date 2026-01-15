@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.mealtracker.domains.Role.ADMIN;
-import static com.mealtracker.domains.Role.REGULAR_USER;
-import static com.mealtracker.domains.Role.USER_MANAGER;
+import static com.mealtracker.domains.Role.*;
 import static java.util.Arrays.asList;
 
 @Configuration

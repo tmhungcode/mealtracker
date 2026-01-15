@@ -40,6 +40,7 @@ public class ListMyMealInputMatchers {
             this.rowsPerPage = Optional.ofNullable(rowsPerPage);
             return this;
         }
+
         public OptionalListMyMealInput pageIndex(Integer pageIndex) {
             this.pageIndex = Optional.ofNullable(pageIndex);
             return this;

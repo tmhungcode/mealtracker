@@ -5,23 +5,21 @@ import com.mealtracker.assertions.AppAssertions;
 import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
 import com.mealtracker.domains.UserSettings;
+import com.mealtracker.payloads.Error;
 import com.mealtracker.security.CurrentUser;
 import com.mealtracker.services.pagination.PageableBuilder;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.mealtracker.payloads.Error;
 import static com.mealtracker.assertions.AppAssertions.assertThatThrownBy;
 import static com.mealtracker.services.user.UserMatchers.eq;
 import static com.mealtracker.services.user.UserMatchers.fields;
 import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AccessibleRolesUserManagementServiceTest {
 

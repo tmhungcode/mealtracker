@@ -3,7 +3,7 @@ package com.mealtracker.exceptions;
 import com.mealtracker.payloads.Error;
 
 public class AuthorizationAppException extends AppException {
-    private static final int API_ACCESS_DENIED  = 40300;
+    private static final int API_ACCESS_DENIED = 40300;
     private static final int NOT_RESOURCE_OWNER = 40301;
 
 

@@ -4,12 +4,14 @@ import com.mealtracker.domains.Ownable;
 import com.mealtracker.domains.Privilege;
 import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class CurrentUser {
     private final Long id;
     private final String email;

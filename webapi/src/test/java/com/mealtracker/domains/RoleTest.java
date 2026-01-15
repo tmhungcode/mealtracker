@@ -1,14 +1,10 @@
 package com.mealtracker.domains;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static com.mealtracker.domains.Privilege.MEAL_MANAGEMENT;
-import static com.mealtracker.domains.Privilege.MY_MEALS;
-import static com.mealtracker.domains.Privilege.USER_MANAGEMENT;
-import static com.mealtracker.domains.Role.ADMIN;
-import static com.mealtracker.domains.Role.REGULAR_USER;
-import static com.mealtracker.domains.Role.USER_MANAGER;
+import static com.mealtracker.domains.Privilege.*;
+import static com.mealtracker.domains.Role.*;
 
 public class RoleTest {
     @Test

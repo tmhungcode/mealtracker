@@ -4,7 +4,6 @@ import com.mealtracker.domains.Meal;
 import com.mealtracker.payloads.MetaSuccessEnvelop;
 import com.mealtracker.payloads.PaginationMeta;
 import com.mealtracker.payloads.SuccessEnvelop;
-import lombok.Data;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
@@ -12,22 +11,12 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
-public class MealResponse {
-    private final long id;
-    private final String name;
-    private final LocalDate consumedDate;
-    private final LocalTime consumedTime;
-    private final int calories;
-    private final BriefUserResponse consumer;
+public record MealResponse(long id, String name, LocalDate consumedDate, LocalTime consumedTime, int calories,
+                           BriefUserResponse consumer) {
 
     private MealResponse(Meal meal) {
-        id = meal.getId();
-        name = meal.getName();
-        consumedDate = meal.getConsumedDate();
-        consumedTime = meal.getConsumedTime();
-        calories = meal.getCalories();
-        consumer = new BriefUserResponse(meal.getConsumer());
+        this(meal.getId(), meal.getName(), meal.getConsumedDate(), meal.getConsumedTime(), meal.getCalories(),
+                new BriefUserResponse(meal.getConsumer()));
     }
 
     public static SuccessEnvelop<MealResponse> envelop(Meal meal) {

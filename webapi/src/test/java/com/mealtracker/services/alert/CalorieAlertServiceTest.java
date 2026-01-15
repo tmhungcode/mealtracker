@@ -6,21 +6,21 @@ import com.mealtracker.security.CurrentUser;
 import com.mealtracker.services.meal.MyMealService;
 import com.mealtracker.services.user.UserService;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.mealtracker.utils.matchers.CommonMatchers.eq;
 import static com.mealtracker.utils.matchers.CommonMatchers.fields;
 import static com.mealtracker.utils.matchers.LocalDateMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CalorieAlertServiceTest {
 
     private static final int DISABLED_CALORIE_LIMIT = 0;
@@ -33,7 +33,6 @@ public class CalorieAlertServiceTest {
 
     @Mock
     private MyMealService myMealService;
-
 
     @Test
     public void getAlert_DailyLimitDisabled_ExpectNoAlert() {
@@ -80,11 +79,9 @@ public class CalorieAlertServiceTest {
                 .hasFieldOrPropertyWithValue("totalCalories", acceptableConsumption);
     }
 
-
     CurrentUser currentUser(long id) {
-        var currentUser = Mockito.mock(CurrentUser.class);
-        when(currentUser.getId()).thenReturn(id);
-        return currentUser;
+        // Create real CurrentUser instead of mocking
+        return new CurrentUser(id, "test@example.com", null, List.of(), "Test User");
     }
 
     User user(int dailyCalorieLimit) {

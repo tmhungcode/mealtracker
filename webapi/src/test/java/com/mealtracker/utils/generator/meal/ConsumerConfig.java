@@ -34,7 +34,7 @@ class ConsumerConfig {
         }
         return dates;
     }
-    
+
     List<LocalTime> getEatingTimes() {
         return diet.getEatingTimes();
     }

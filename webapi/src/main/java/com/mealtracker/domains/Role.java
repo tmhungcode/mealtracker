@@ -3,9 +3,7 @@ package com.mealtracker.domains;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mealtracker.domains.Privilege.MEAL_MANAGEMENT;
-import static com.mealtracker.domains.Privilege.MY_MEALS;
-import static com.mealtracker.domains.Privilege.USER_MANAGEMENT;
+import static com.mealtracker.domains.Privilege.*;
 
 public enum Role {
     REGULAR_USER(Arrays.asList(MY_MEALS)),
