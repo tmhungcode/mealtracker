@@ -2,7 +2,7 @@ package com.mealtracker.security;
 
 import com.mealtracker.domains.Privilege;
 import com.mealtracker.domains.Role;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Arrays;

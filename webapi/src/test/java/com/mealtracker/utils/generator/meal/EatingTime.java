@@ -19,15 +19,15 @@ public enum EatingTime {
         this.timeSlots = new ArrayList<>(Arrays.asList(timeSlots));
     }
 
+    private static LocalTime time(int hour, int minute) {
+        return LocalTime.of(hour, minute);
+    }
+
     public LocalTime getTimeSlot() {
         if (timeSlots.size() == 1) {
-            return timeSlots.get(0);
+            return timeSlots.getFirst();
         }
         int randomInd = RandomGenerator.randomInRange(0, timeSlots.size() - 1);
         return timeSlots.get(randomInd);
-    }
-
-    private static LocalTime time(int hour, int minute) {
-        return LocalTime.of(hour, minute);
     }
 }

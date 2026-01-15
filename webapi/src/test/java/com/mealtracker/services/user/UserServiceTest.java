@@ -4,12 +4,12 @@ import com.mealtracker.assertions.AppAssertions;
 import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
 import com.mealtracker.repositories.UserRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
     @Spy
@@ -45,7 +45,8 @@ public class UserServiceTest {
         var emailOwner = new User();
         when(userRepository.findByEmail("email_taken@abc.com")).thenReturn(Optional.of(emailOwner));
 
-        AppAssertions.assertThatThrownBy(() -> userService.addUser(newUser)).hasError(40001, "Email email_taken@abc.com is already taken");
+        AppAssertions.assertThatThrownBy(() -> userService.addUser(newUser)).hasError(40001,
+                "Email email_taken@abc.com is already taken");
     }
 
     @Test
@@ -59,7 +60,6 @@ public class UserServiceTest {
 
         assertThat(userService.updateUser(newUser)).isEqualTo(result);
     }
-
 
     @Test
     public void addUser_EmailUpperCase_ExpectEmailStoredLowerCase() {
@@ -148,7 +148,6 @@ public class UserServiceTest {
         assertThat(userService.getExistingUser(foundUser.getId())).isEqualTo(foundUser);
     }
 
-
     @Test
     public void loadUserByUsername_EmailNotFound_ExpectAuthenticationException() {
         var unkownEmail = "UnKNown@gmail.com";
@@ -167,7 +166,8 @@ public class UserServiceTest {
         when(userRepository.findByEmail(deletedUser.getEmail().toLowerCase())).thenReturn(Optional.of(deletedUser));
 
         AppAssertions.assertThatThrownBy(() -> userService.loadUserByUsername(deletedUser.getEmail()))
-                .hasError(40104, "Your account have been deleted. Please contact our supports if you have any question");
+                .hasError(40104,
+                        "Your account have been deleted. Please contact our supports if you have any question");
     }
 
     @Test

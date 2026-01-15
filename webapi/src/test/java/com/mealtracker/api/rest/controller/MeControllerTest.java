@@ -1,19 +1,21 @@
-package com.mealtracker.api.rest;
-
+package com.mealtracker.api.rest.controller;
 
 import com.mealtracker.MealTrackerApplication;
+import com.mealtracker.api.rest.MeController;
 import com.mealtracker.config.WebSecurityConfig;
 import com.mealtracker.domains.UserSettings;
 import com.mealtracker.services.user.UserService;
 import com.mealtracker.services.usersettings.MySettingsInput;
 import com.mealtracker.services.usersettings.UserSettingsService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.mealtracker.TestError.AUTHENTICATION_MISSING_TOKEN;
@@ -24,29 +26,38 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+/**
+ * Controller layer tests for MeController.
+ * Tests user settings retrieval and update with mocked services.
+ */
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {MeController.class})
-@ContextConfiguration(classes={MealTrackerApplication.class, WebSecurityConfig.class})
-public class MeControllerIT {
+@ContextConfiguration(classes = {MealTrackerApplication.class, WebSecurityConfig.class})
+@Tag("controller")
+@Tag("webmvc")
+@DisplayName("MeController - User Settings")
+class MeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserSettingsService userSettingsService;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     @Test
-    public void getMySettings_Anonymous_ExpectAuthenticationError() throws Exception {
+    @DisplayName("Get my settings without authentication - Expect 401 Unauthorized")
+    void getMySettings_Anonymous_ExpectAuthenticationError() throws Exception {
         mockMvc.perform(get("/v1/users/me"))
                 .andExpect(AUTHENTICATION_MISSING_TOKEN.httpStatus())
                 .andExpect(AUTHENTICATION_MISSING_TOKEN.json());
     }
 
     @Test
-    public void getMySettings_UserHasSettings_ExpectUserSettingsReturned() throws Exception {
+    @DisplayName("Get my settings when user has settings - Expect settings returned")
+    void getMySettings_UserHasSettings_ExpectUserSettingsReturned() throws Exception {
         var userSettings = new UserSettings();
         userSettings.setDailyCalorieLimit(500);
         when(userSettingsService.getUserSettings(USER.getId())).thenReturn(userSettings);
@@ -56,7 +67,8 @@ public class MeControllerIT {
     }
 
     @Test
-    public void getMySettings_UserHasNoSettings_ExpectEmptyDataReturned() throws Exception {
+    @DisplayName("Get my settings when user has no settings - Expect empty data")
+    void getMySettings_UserHasNoSettings_ExpectEmptyDataReturned() throws Exception {
         when(userSettingsService.getUserSettings(USER.getId())).thenReturn(null);
         mockMvc.perform(get("/v1/users/me").auth(USER))
                 .andExpect(status().isOk())
@@ -64,28 +76,31 @@ public class MeControllerIT {
     }
 
     @Test
-    public void updateMySettings_Anonymous_ExpectAuthenticationError() throws Exception {
+    @DisplayName("Update my settings without authentication - Expect 401 Unauthorized")
+    void updateMySettings_Anonymous_ExpectAuthenticationError() throws Exception {
         mockMvc.perform(patch("/v1/users/me"))
                 .andExpect(AUTHENTICATION_MISSING_TOKEN.httpStatus())
                 .andExpect(AUTHENTICATION_MISSING_TOKEN.json());
     }
 
     @Test
-    public void updateMySettings_BadInput_ExpectBadInputError() throws Exception {
+    @DisplayName("Update my settings with invalid data - Expect 400 Bad Request")
+    void updateMySettings_BadInput_ExpectBadInputError() throws Exception {
         var request = updateCalorieLimitRequest(-1);
         mockMvc.perform(patch("/v1/users/me").auth(USER).content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'dailyCalorieLimit','message':'must be greater than or equal to 0'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'dailyCalorieLimit','message':'must be greater than or equal to 0'}]}}"));
     }
 
     @Test
-    public void updateMySettings_ValidCalorieLimit_ExpectSettingsUpdated() throws Exception {
+    @DisplayName("Update my settings with valid data - Expect settings updated successfully")
+    void updateMySettings_ValidCalorieLimit_ExpectSettingsUpdated() throws Exception {
         var request = updateCalorieLimitRequest(900);
         mockMvc.perform(patch("/v1/users/me").auth(USER).content(request))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data':{'message':'User settings updated successfully'}}"));
     }
-
 
     public MySettingsInput updateCalorieLimitRequest(Integer calorieLimit) {
         var request = new MySettingsInput();

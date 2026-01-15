@@ -1,6 +1,5 @@
 package com.mealtracker.services.meal;
 
-import com.mealtracker.assertions.AppAssertions;
 import com.mealtracker.domains.Meal;
 import com.mealtracker.domains.User;
 import com.mealtracker.payloads.Error;
@@ -10,18 +9,18 @@ import com.mealtracker.services.pagination.PageableBuilder;
 import com.mealtracker.services.user.UserMatchers;
 import com.mealtracker.utils.matchers.LocalDateMatchers;
 import com.mealtracker.utils.matchers.LocalTimeMatchers;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.mealtracker.assertions.AppAssertions.assertThatThrownBy;
@@ -30,11 +29,9 @@ import static com.mealtracker.services.meal.MealMatchers.fields;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MyMealServiceTest {
 
     private static final Error MEAL_NOT_EXIST = Error.of(40401, "The given meal does not exist");
@@ -59,8 +56,7 @@ public class MyMealServiceTest {
                 .deleted(false)
                 .consumedTime(input.getConsumedTime())
                 .consumedDate(input.getConsumedDate())
-                .calories(input.getCalories())
-        ));
+                .calories(input.getCalories())));
     }
 
     @Test
@@ -78,7 +74,8 @@ public class MyMealServiceTest {
         var currentUser = currentUser(12L);
         var existingMeal = existingMeal(9L, currentUser.getId());
         var input = validInput();
-        when(mealRepository.findExistingMeal(existingMeal.getId(), currentUser.getId())).thenReturn(Optional.of(existingMeal));
+        when(mealRepository.findExistingMeal(existingMeal.getId(), currentUser.getId()))
+                .thenReturn(Optional.of(existingMeal));
 
         myMealService.updateMeal(existingMeal.getId(), validInput(), currentUser);
 
@@ -86,8 +83,7 @@ public class MyMealServiceTest {
                 .id(9L).name(input.getName())
                 .calories(input.getCalories())
                 .deleted(false).consumerId(currentUser.getId())
-                .consumedDate(input.getConsumedDate()).consumedTime(input.getConsumedTime())
-        ));
+                .consumedDate(input.getConsumedDate()).consumedTime(input.getConsumedTime())));
     }
 
     @Test
@@ -104,7 +100,8 @@ public class MyMealServiceTest {
     public void getMeal_MealFound_ExpectDetailsReturned() {
         var currentUser = currentUser(18L);
         var existingMeal = existingMeal(2L, currentUser.getId());
-        when(mealRepository.findExistingMeal(existingMeal.getId(), currentUser.getId())).thenReturn(Optional.of(existingMeal));
+        when(mealRepository.findExistingMeal(existingMeal.getId(), currentUser.getId()))
+                .thenReturn(Optional.of(existingMeal));
 
         assertThat(myMealService.getMeal(existingMeal.getId(), currentUser)).isEqualTo(existingMeal);
     }
@@ -196,7 +193,8 @@ public class MyMealServiceTest {
         var pageable = mock(Pageable.class);
         var result = mock(Page.class);
         when(pageableBuilder.build(input)).thenReturn(pageable);
-        when(mealRepository.filterMyMeals(eq(currentUser.getId()), isNull(), isNull(), isNull(), isNull(), eq(pageable))).thenReturn(result);
+        when(mealRepository.filterMyMeals(eq(currentUser.getId()), isNull(), isNull(), isNull(), isNull(),
+                eq(pageable))).thenReturn(result);
 
         assertThat(myMealService.listMeals(input, currentUser)).isEqualTo(result);
     }
@@ -204,7 +202,8 @@ public class MyMealServiceTest {
     @Test
     public void listMeals_All_CriteriaAvailable_ExpectProceedFilter() {
         var currentUser = currentUser(1L);
-        var input = criteriaBuilder().fromTime("00:00").toTime("23:59").fromDate("2000-01-01").toDate("2000-02-02").build();
+        var input = criteriaBuilder().fromTime("00:00").toTime("23:59").fromDate("2000-01-01").toDate("2000-02-02")
+                .build();
         var pageable = mock(Pageable.class);
         var result = mock(Page.class);
         when(pageableBuilder.build(input)).thenReturn(pageable);
@@ -230,13 +229,8 @@ public class MyMealServiceTest {
     }
 
     CurrentUser currentUser(long id) {
-        var user = new User();
-        user.setId(id);
-
-        var currentUser = Mockito.mock(CurrentUser.class);
-        when(currentUser.getId()).thenReturn(id);
-        when(currentUser.toUser()).thenReturn(user);
-        return currentUser;
+        // Create real CurrentUser instead of mocking
+        return new CurrentUser(id, "test@example.com", null, List.of(), "Test User");
     }
 
     MyMealInput validInput() {

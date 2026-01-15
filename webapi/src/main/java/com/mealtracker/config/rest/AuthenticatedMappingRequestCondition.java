@@ -1,11 +1,10 @@
 package com.mealtracker.config.rest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class AuthenticatedMappingRequestCondition implements RequestCondition<AuthenticatedMappingRequestCondition> {
 

@@ -13,28 +13,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
-)
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig {
 
     @Bean
@@ -59,7 +53,8 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationHandler jwtAuthenticationHandler(JwtTokenProvider jwtTokenProvider, JwtTokenValidator jwtTokenValidator) {
+    public JwtAuthenticationHandler jwtAuthenticationHandler(JwtTokenProvider jwtTokenProvider,
+                                                             JwtTokenValidator jwtTokenValidator) {
         return new JwtAuthenticationHandler(jwtTokenProvider, jwtTokenValidator);
     }
 
@@ -80,47 +75,37 @@ public class WebSecurityConfig {
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults() {
         var emptyRoleVoterPrefix = "";
-        return  new GrantedAuthorityDefaults(emptyRoleVoterPrefix);
+        return new GrantedAuthorityDefaults(emptyRoleVoterPrefix);
     }
 
-    @Configuration
-    public static class AppWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
-        private final HandlerExceptionResolver exceptionResolver;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) throws Exception {
+        http
+                .cors(cors -> cors.configure(http))
+                .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(new RestAccessDeniedHandler(exceptionResolver))
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint(exceptionResolver)))
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(request -> request.getMethod().equals("GET") &&
+                                request.getRequestURI().matches("\\/v1\\/users\\/?\\?email=.*"))
+                        .permitAll()
+                        .requestMatchers("/v1/users").permitAll()
+                        .requestMatchers("/v1/sessions").permitAll()
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/info").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        public AppWebSecurityConfigurerAdapter(JwtAuthenticationFilter jwtAuthenticationFilter,
-                                               @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
-            this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-            this.exceptionResolver = exceptionResolver;
-        }
+        return http.build();
+    }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-
-            http
-                    .cors().and().csrf().disable()
-                    .exceptionHandling()
-                    .accessDeniedHandler(new RestAccessDeniedHandler(exceptionResolver))
-                    .authenticationEntryPoint(new RestAuthenticationEntryPoint(exceptionResolver)).and()
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                    .authorizeRequests()
-                    .regexMatchers(GET, "\\/v1\\/users\\/?\\?email=.*").permitAll()
-                    .antMatchers(POST, "/v1/users").permitAll()
-                    .antMatchers(POST, "/v1/sessions").permitAll()
-
-                    .anyRequest().authenticated();
-
-
-            // Add our custom JWT security filter
-            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        }
-
-        @Bean
-        @Override
-        public AuthenticationManager authenticationManagerBean() throws Exception {
-            return super.authenticationManagerBean();
-        }
-
-
+    @Bean
+    public AuthenticationManager authenticationManager(DaoAuthenticationProvider authenticationProvider) {
+        return authentication -> authenticationProvider.authenticate(authentication);
     }
 }

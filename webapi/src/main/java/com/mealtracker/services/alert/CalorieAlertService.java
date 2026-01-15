@@ -3,7 +3,6 @@ package com.mealtracker.services.alert;
 import com.mealtracker.security.CurrentUser;
 import com.mealtracker.services.meal.MyMealService;
 import com.mealtracker.services.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +12,13 @@ import java.time.LocalDate;
 @Transactional
 public class CalorieAlertService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final MyMealService myMealService;
 
-    @Autowired
-    private MyMealService myMealService;
+    public CalorieAlertService(UserService userService, MyMealService myMealService) {
+        this.userService = userService;
+        this.myMealService = myMealService;
+    }
 
     public CalorieAlertOutput getAlert(LocalDate date, CurrentUser currentUser) {
         var user = userService.getExistingUser(currentUser.getId());

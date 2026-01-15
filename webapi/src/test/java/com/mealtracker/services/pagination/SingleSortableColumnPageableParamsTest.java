@@ -2,9 +2,8 @@ package com.mealtracker.services.pagination;
 
 import com.mealtracker.ValidatorProvider;
 import com.mealtracker.assertions.AppAssertions;
-import org.junit.Test;
-
-import javax.validation.Validator;
+import jakarta.validation.Validator;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

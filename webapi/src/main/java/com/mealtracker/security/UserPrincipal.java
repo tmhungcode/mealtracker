@@ -23,6 +23,20 @@ public class UserPrincipal implements UserDetails {
     private final boolean enabled;
 
 
+    public UserPrincipal(Long id,
+                         String email,
+                         Role role,
+                         List<Privilege> privileges,
+                         String fullName, String getEncryptedPassword, boolean enabled) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+        this.privileges = privileges;
+        this.fullName = fullName;
+        this.getEncryptedPassword = getEncryptedPassword;
+        this.enabled = enabled;
+    }
+
     public static UserPrincipal allDetails(User user) {
         return new UserPrincipal(user.getId(), user.getEmail(), user.getRole(), user.getPrivileges(),
                 user.getFullName(), user.getEncryptedPassword(), user.isEnabled());
@@ -38,21 +52,6 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(id, email, role, privileges, fullName, null, true);
     }
 
-    public UserPrincipal(Long id,
-                         String email,
-                         Role role,
-                         List<Privilege> privileges,
-                         String fullName, String getEncryptedPassword, boolean enabled) {
-        this.id = id;
-        this.email = email;
-        this.role = role;
-        this.privileges = privileges;
-        this.fullName = fullName;
-        this.getEncryptedPassword = getEncryptedPassword;
-        this.enabled = enabled;
-    }
-
-
     public Map<String, Object> toJwtClaims() {
         var claims = new HashMap<String, Object>();
         claims.put("id", id);
@@ -66,6 +65,7 @@ public class UserPrincipal implements UserDetails {
     public Long getId() {
         return id;
     }
+
     public String getEmail() {
         return email;
     }

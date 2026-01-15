@@ -5,28 +5,22 @@ import com.mealtracker.domains.Meal;
 import com.mealtracker.domains.User;
 import com.mealtracker.payloads.Error;
 import com.mealtracker.repositories.MealRepository;
-import com.mealtracker.services.meal.MyMealService;
 import com.mealtracker.services.pagination.PageableBuilder;
-import com.mealtracker.services.user.ListUsersInput;
 import com.mealtracker.services.user.UserService;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MealServiceTest {
     private static final Error MEAL_NOT_FOUND = Error.of(40401, "The given meal does not exist");
 
@@ -60,8 +54,7 @@ public class MealServiceTest {
                 .consumerId(input.getConsumerId())
                 .consumedDate(input.getConsumedDate())
                 .consumedTime(input.getConsumedTime())
-                .deleted(false)
-        ));
+                .deleted(false)));
 
     }
 
@@ -96,8 +89,7 @@ public class MealServiceTest {
                 .consumerId(input.getConsumerId())
                 .consumedDate(input.getConsumedDate())
                 .consumedTime(input.getConsumedTime())
-                .deleted(false)
-        ));
+                .deleted(false)));
     }
 
     @Test
@@ -138,13 +130,11 @@ public class MealServiceTest {
         Assertions.assertThat(mealService.getMeal(existingMeal.getId())).isEqualTo(existingMeal);
     }
 
-
     MealInput mealInput(User consumer) {
         var input = new MealInput();
         input.setConsumerId(consumer.getId());
         return input;
     }
-
 
     User consumer(Long id) {
         var user = new User();

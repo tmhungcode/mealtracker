@@ -7,6 +7,7 @@ import org.assertj.core.api.ThrowableAssert;
 
 public class AppExceptionAssert extends AbstractThrowableAssert<AppExceptionAssert, AppException> {
     private Error actual;
+
     public AppExceptionAssert(AppException e) {
         super(e, AppExceptionAssert.class);
         actual = e.getError();

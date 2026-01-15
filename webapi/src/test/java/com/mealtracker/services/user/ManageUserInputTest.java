@@ -3,9 +3,8 @@ package com.mealtracker.services.user;
 import com.mealtracker.ValidatorProvider;
 import com.mealtracker.validation.OnAdd;
 import com.mealtracker.validation.OnUpdate;
-import org.junit.Test;
-
-import javax.validation.Validator;
+import jakarta.validation.Validator;
+import org.junit.jupiter.api.Test;
 
 import static com.mealtracker.assertions.AppAssertions.assertThat;
 

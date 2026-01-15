@@ -11,8 +11,9 @@ import java.time.format.DateTimeFormatter;
 
 public class WritableMeal implements Writable {
 
-    private static final String MYSQL_INSERT_TEMPLATE = "INSERT INTO meals (id, name, calories, consumed_date, consumed_time, consumer_id, deleted) " +
-            "VALUES (%s, '%s', %s, '%s', '%s', %s, %s);";
+    private static final String MYSQL_INSERT_TEMPLATE = """
+            INSERT INTO meals (id, name, calories, consumed_date, consumed_time, consumer_id, deleted) \
+            VALUES (%s, '%s', %s, '%s', '%s', %s, %s);""";
 
     private final Meal meal = new Meal();
 
@@ -69,7 +70,7 @@ public class WritableMeal implements Writable {
         String consumedTime = meal.getConsumedTime().format(DateTimeFormatter.ISO_LOCAL_TIME);
         long consumerId = meal.getConsumer().getId();
         String escapedName = StringUtils.sqlEscape(meal.getName());
-        return String.format(MYSQL_INSERT_TEMPLATE,meal.getId(), escapedName, meal.getCalories(), consumedDate, consumedTime, consumerId, deleted);
+        return String.format(MYSQL_INSERT_TEMPLATE, meal.getId(), escapedName, meal.getCalories(), consumedDate, consumedTime, consumerId, deleted);
     }
 
 }

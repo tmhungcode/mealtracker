@@ -1,7 +1,7 @@
 package com.mealtracker.config;
 
-import com.mealtracker.config.rest.CurrentUserMethodArgumentResolver;
 import com.mealtracker.config.rest.AuthenticatedMappingHandlerMapping;
+import com.mealtracker.config.rest.CurrentUserMethodArgumentResolver;
 import com.mealtracker.exceptions.ErrorIdGenerator;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.MessageSource;
@@ -12,17 +12,23 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.List;
-
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     // TODO: Extract the url into webclient.baseUrl and apply to the Local profile
     private static final long MAX_AGE_SECS = 3600;
+
+    private final RequestLoggingInterceptor requestLoggingInterceptor;
+
+    public WebConfig(RequestLoggingInterceptor requestLoggingInterceptor) {
+        this.requestLoggingInterceptor = requestLoggingInterceptor;
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -32,7 +38,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(MAX_AGE_SECS);
     }
 
-
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         // stop forward 404 to the default handler
@@ -41,6 +46,13 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new CurrentUserMethodArgumentResolver());
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(requestLoggingInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/actuator/**", "/health/**");
     }
 
     @Bean
@@ -63,7 +75,6 @@ public class WebConfig implements WebMvcConfigurer {
     public ErrorIdGenerator errorIdGenerator() {
         return new ErrorIdGenerator();
     }
-
 
     @Configuration
     public static class WebMvcRegistrationsConfig implements WebMvcRegistrations {
