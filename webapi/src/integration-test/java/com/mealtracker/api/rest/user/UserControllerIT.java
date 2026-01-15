@@ -1,25 +1,21 @@
 package com.mealtracker.api.rest.user;
 
 import com.mealtracker.MealTrackerApplication;
-import com.mealtracker.api.rest.user.UserController;
 import com.mealtracker.api.rest.user.builders.DomainUserBuilder;
 import com.mealtracker.config.WebSecurityConfig;
 import com.mealtracker.domains.Role;
 import com.mealtracker.services.pagination.PageableOrder;
-import com.mealtracker.services.user.DeleteUsersInput;
-import com.mealtracker.services.user.ManageUserInput;
-import com.mealtracker.services.user.UserManagementService;
-import com.mealtracker.services.user.UserManagementServiceResolver;
-import com.mealtracker.services.user.UserService;
+import com.mealtracker.services.user.*;
 import com.mealtracker.utils.matchers.CurrentUserMatchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -28,34 +24,33 @@ import static com.mealtracker.TestError.AUTHORIZATION_API_ACCESS_DENIED;
 import static com.mealtracker.TestUser.NO_USER_MANAGEMENT;
 import static com.mealtracker.TestUser.ONLY_USER_MANAGEMENT;
 import static com.mealtracker.api.rest.user.matchers.ListUsersInputMatchers.pagination;
-import static com.mealtracker.request.AppRequestBuilders.delete;
-import static com.mealtracker.request.AppRequestBuilders.get;
-import static com.mealtracker.request.AppRequestBuilders.post;
-import static com.mealtracker.request.AppRequestBuilders.put;
+import static com.mealtracker.request.AppRequestBuilders.*;
 import static com.mealtracker.utils.MockPageBuilder.oneRowsPerPage;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {UserController.class})
 @ContextConfiguration(classes = {MealTrackerApplication.class, WebSecurityConfig.class})
+@Tag("integration")
+@Tag("controller")
 public class UserControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserManagementServiceResolver serviceResolver;
 
-    @MockBean
+    @MockitoBean
     private UserManagementService userManagementService;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(serviceResolver.resolve(CurrentUserMatchers.eq(ONLY_USER_MANAGEMENT))).thenReturn(userManagementService);
     }
@@ -74,7 +69,8 @@ public class UserControllerIT {
 
         mockMvc.perform(post("/v1/users").auth(ONLY_USER_MANAGEMENT).content(userWithoutPassword))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'password','message':'must not be null'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'password','message':'must not be null'}]}}"));
     }
 
     @Test
@@ -103,7 +99,8 @@ public class UserControllerIT {
 
         mockMvc.perform(get("/v1/users").auth(ONLY_USER_MANAGEMENT).oneRowPerPage())
                 .andExpect(status().isOk())
-                .andExpect(content().json("{'data':[{'id':99,'email':'hulk@abc.com','fullName':'David Banner','role':'USER_MANAGER','dailyCalorieLimit':1500}],'metaData':{'totalElements':494,'totalPages':494}}"));
+                .andExpect(content().json(
+                        "{'data':[{'id':99,'email':'hulk@abc.com','fullName':'David Banner','role':'USER_MANAGER','dailyCalorieLimit':1500}],'metaData':{'totalElements':494,'totalPages':494}}"));
     }
 
     @Test
@@ -117,7 +114,8 @@ public class UserControllerIT {
     public void deleteUsers_BadInput_ExpectBadInputError() throws Exception {
         mockMvc.perform(delete("/v1/users").auth(ONLY_USER_MANAGEMENT).emptyJsonContent())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'ids','message':'must not be null'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'ids','message':'must not be null'}]}}"));
     }
 
     @Test
@@ -145,7 +143,8 @@ public class UserControllerIT {
         when(userManagementService.getUser(eq(15L))).thenReturn(user);
         mockMvc.perform(get("/v1/users/15").auth(ONLY_USER_MANAGEMENT))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{'data':{'id':15,'email':'batman@abc.com','fullName':'Bruce Wayne','role':'ADMIN','dailyCalorieLimit':1500}}"));
+                .andExpect(content().json(
+                        "{'data':{'id':15,'email':'batman@abc.com','fullName':'Bruce Wayne','role':'ADMIN','dailyCalorieLimit':1500}}"));
     }
 
     @Test
@@ -162,7 +161,8 @@ public class UserControllerIT {
 
         mockMvc.perform(put("/v1/users/2").auth(ONLY_USER_MANAGEMENT).content(badInput))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'email','message':'must not be null'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'email','message':'must not be null'}]}}"));
     }
 
     @Test
@@ -181,7 +181,6 @@ public class UserControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data':{'message':'User updated successfully'}}"));
     }
-
 
     private ManageUserInput manageUserRequest() {
         var input = new ManageUserInput();

@@ -1,19 +1,19 @@
 package com.mealtracker.api.rest;
 
-
 import com.mealtracker.MealTrackerApplication;
 import com.mealtracker.config.WebSecurityConfig;
 import com.mealtracker.domains.UserSettings;
 import com.mealtracker.services.user.UserService;
 import com.mealtracker.services.usersettings.MySettingsInput;
 import com.mealtracker.services.usersettings.UserSettingsService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.mealtracker.TestError.AUTHENTICATION_MISSING_TOKEN;
@@ -24,18 +24,20 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {MeController.class})
-@ContextConfiguration(classes={MealTrackerApplication.class, WebSecurityConfig.class})
+@ContextConfiguration(classes = {MealTrackerApplication.class, WebSecurityConfig.class})
+@Tag("integration")
+@Tag("controller")
 public class MeControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserSettingsService userSettingsService;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     @Test
@@ -75,7 +77,8 @@ public class MeControllerIT {
         var request = updateCalorieLimitRequest(-1);
         mockMvc.perform(patch("/v1/users/me").auth(USER).content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'dailyCalorieLimit','message':'must be greater than or equal to 0'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'dailyCalorieLimit','message':'must be greater than or equal to 0'}]}}"));
     }
 
     @Test
@@ -85,7 +88,6 @@ public class MeControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data':{'message':'User settings updated successfully'}}"));
     }
-
 
     public MySettingsInput updateCalorieLimitRequest(Integer calorieLimit) {
         var request = new MySettingsInput();

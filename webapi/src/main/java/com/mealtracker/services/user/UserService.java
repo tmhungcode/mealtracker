@@ -8,7 +8,6 @@ import com.mealtracker.exceptions.ResourceName;
 import com.mealtracker.exceptions.ResourceNotFoundAppException;
 import com.mealtracker.repositories.UserRepository;
 import com.mealtracker.security.UserPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,11 +23,13 @@ import java.util.Optional;
 @Transactional
 public class UserService implements UserDetailsService {
     private static final String START_WITH_TEMPLATE = "%s%%";
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User addUser(User newUser) {
         newUser.setEmail(newUser.getEmail().toLowerCase());
@@ -62,7 +63,6 @@ public class UserService implements UserDetailsService {
         var startWith = String.format(START_WITH_TEMPLATE, keyword.toLowerCase());
         return userRepository.lookupExistingUsers(startWith, includedRoles, pageable);
     }
-
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email.toLowerCase());

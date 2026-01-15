@@ -1,10 +1,9 @@
 package com.mealtracker;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 public class ValidatorProvider {
     private static Validator validator;

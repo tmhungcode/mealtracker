@@ -1,37 +1,31 @@
 package com.mealtracker.validation;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.validation.ConstraintValidatorContext;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class LocalTimeFormatValidatorTest {
 
-    private final ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);
-
     @Test
     public void isValid_InputMissing_AllowNull_ExpectValid() {
-        assertThat(validator(true).isValid(null, context)).isTrue();
+        assertThat(validator(true).isValid(null, null)).isTrue();
     }
 
     @Test
     public void isValid_InputMissing_NotAllowNull_ExpectInvalid() {
-        assertThat(validator(false).isValid(null, context)).isFalse();
+        assertThat(validator(false).isValid(null, null)).isFalse();
     }
 
     @Test
     public void isValid_InputBadDateFormat_ExpectInvalid() {
-        assertThat(validator(false).isValid("00-05", context)).isFalse();
+        assertThat(validator(false).isValid("00-05", null)).isFalse();
     }
 
     @Test
     public void isValid_InputValidDateFormat_ExpectValid() {
-        assertThat(validator(false).isValid("06:50", context)).isTrue();
+        assertThat(validator(false).isValid("06:50", null)).isTrue();
     }
 
     private LocalTimeFormatValidator validator(boolean nullable) {

@@ -6,11 +6,12 @@ import com.mealtracker.domains.UserSettings;
 import com.mealtracker.validation.OnAdd;
 import com.mealtracker.validation.OnUpdate;
 import com.mealtracker.validation.ValueInList;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ManageUserInput extends UserInput {
 
     @NotNull(groups = {OnAdd.class, OnUpdate.class})

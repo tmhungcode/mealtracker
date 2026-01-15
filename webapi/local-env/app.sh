@@ -11,5 +11,3 @@ docker-compose up -d
 echo ">>>>>>>>>>>>>>>>>>> Starting the application Meal Tracker"
 cd ..
 ./mvnw clean compile -DskipTests spring-boot:run
-
-

@@ -1,9 +1,8 @@
 package com.mealtracker.services.usersettings;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 @Data
 public class MySettingsInput {

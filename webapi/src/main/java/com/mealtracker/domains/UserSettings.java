@@ -1,11 +1,14 @@
 package com.mealtracker.domains;
 
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Embeddable
 public class UserSettings {
     private static final int DISABLED_CALORIE_LIMIT = 0;
@@ -15,5 +18,27 @@ public class UserSettings {
 
     public boolean isCalorieLimitEnabled() {
         return dailyCalorieLimit > DISABLED_CALORIE_LIMIT;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserSettings that = (UserSettings) o;
+        return dailyCalorieLimit == that.dailyCalorieLimit;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dailyCalorieLimit);
+    }
+
+    @Override
+    public String toString() {
+        return "UserSettings{" +
+                "dailyCalorieLimit=" + dailyCalorieLimit +
+                '}';
     }
 }

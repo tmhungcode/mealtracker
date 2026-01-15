@@ -2,11 +2,12 @@ package com.mealtracker.services.meal;
 
 import com.mealtracker.domains.Meal;
 import com.mealtracker.domains.User;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MealInput extends MyMealInput {
 
     @NotNull

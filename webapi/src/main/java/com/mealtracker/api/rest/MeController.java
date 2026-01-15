@@ -6,14 +6,8 @@ import com.mealtracker.payloads.me.GetMySettingsResponse;
 import com.mealtracker.security.CurrentUser;
 import com.mealtracker.services.usersettings.MySettingsInput;
 import com.mealtracker.services.usersettings.UserSettingsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/users/me")
@@ -21,7 +15,6 @@ public class MeController {
 
     private final UserSettingsService userSettingsService;
 
-    @Autowired
     public MeController(UserSettingsService userSettingsService) {
         this.userSettingsService = userSettingsService;
     }

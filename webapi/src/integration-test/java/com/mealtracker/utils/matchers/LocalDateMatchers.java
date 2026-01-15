@@ -11,6 +11,7 @@ public class LocalDateMatchers {
     public static LocalDate eq(String date) {
         return argThat(new StringMatcher(date));
     }
+
     public static LocalDate eq(LocalDate localDate) {
         return argThat(new StringMatcher(localDate.format(DateTimeFormatter.ISO_LOCAL_DATE)));
     }

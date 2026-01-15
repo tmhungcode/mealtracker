@@ -1,26 +1,18 @@
 package com.mealtracker.domains;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "meals")
-@NamedEntityGraph(name = "Meal.consumer",
-        attributeNodes = @NamedAttributeNode("consumer"))
-@Data
+@NamedEntityGraph(name = "Meal.consumer", attributeNodes = @NamedAttributeNode("consumer"))
+@Getter
+@Setter
 public class Meal implements Ownable {
 
     @Id
@@ -49,5 +41,32 @@ public class Meal implements Ownable {
     @Override
     public User getOwner() {
         return consumer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Meal meal = (Meal) o;
+        return id != null && Objects.equals(id, meal.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", consumedDate=" + consumedDate +
+                ", consumedTime=" + consumedTime +
+                ", calories=" + calories +
+                ", deleted=" + deleted +
+                '}';
     }
 }

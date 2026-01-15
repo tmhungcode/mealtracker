@@ -13,8 +13,9 @@ public class WritableUser implements Writable {
     private static final int FIRST_NAME = 0;
     private static final int LAST_NAME = 1;
     private static final String EMAIL_TEMPLATE = "%s_%s_%s@abc.com";
-    private static final String MYSQL_INSERT_TEMPLATE = "INSERT INTO users (id, email, encrypted_password, role, deleted, full_name, daily_calorie_limit) VALUES " +
-            "(%s, '%s', '%s', %s, %s, '%s', %s);";
+    private static final String MYSQL_INSERT_TEMPLATE = """
+            INSERT INTO users (id, email, encrypted_password, role, deleted, full_name, daily_calorie_limit) \
+            VALUES (%s, '%s', '%s', %s, %s, '%s', %s);""";
 
 
     private final User user;
@@ -23,6 +24,11 @@ public class WritableUser implements Writable {
         var settings = new UserSettings();
         user = new User();
         user.setUserSettings(settings);
+    }
+
+    private static String fullNameToEmail(String fullName, long uniqueId) {
+        String[] parts = fullName.toLowerCase().split(NAME_SEPARATOR);
+        return String.format(EMAIL_TEMPLATE, parts[FIRST_NAME], parts[LAST_NAME], uniqueId);
     }
 
     public WritableUser id(long id) {
@@ -59,7 +65,6 @@ public class WritableUser implements Writable {
         return this;
     }
 
-
     public boolean isAdmin() {
         return user.getRole() == Role.ADMIN;
     }
@@ -74,11 +79,6 @@ public class WritableUser implements Writable {
 
     public boolean isDeleted() {
         return user.isDeleted();
-    }
-
-    private static String fullNameToEmail(String fullName, long uniqueId) {
-        String[] parts = fullName.toLowerCase().split(NAME_SEPARATOR);
-        return String.format(EMAIL_TEMPLATE, parts[FIRST_NAME], parts[LAST_NAME], uniqueId);
     }
 
     @Override

@@ -5,11 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.mealtracker.utils.generator.meal.EatingTime.BREAKFAST;
-import static com.mealtracker.utils.generator.meal.EatingTime.DINNER;
-import static com.mealtracker.utils.generator.meal.EatingTime.EARLY_MORNING;
-import static com.mealtracker.utils.generator.meal.EatingTime.LUNCH;
-import static com.mealtracker.utils.generator.meal.EatingTime.MID_NIGHT;
+import static com.mealtracker.utils.generator.meal.EatingTime.*;
 
 public enum Diet {
     THREE_TIMES(BREAKFAST, LUNCH, DINNER),

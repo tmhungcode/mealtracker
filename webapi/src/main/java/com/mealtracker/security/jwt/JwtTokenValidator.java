@@ -1,17 +1,9 @@
 package com.mealtracker.security.jwt;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class JwtTokenValidator {
     private static final List<String> COMMON_MISSING_VALUES = Arrays.asList(null, "undefined", "null", "");
@@ -38,7 +30,7 @@ public class JwtTokenValidator {
         try {
             Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(authToken);
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
-                UnsupportedJwtException | IllegalArgumentException ex) {
+                 UnsupportedJwtException | IllegalArgumentException ex) {
             throw new JwtValidationException(exceptionMessageMapping.get(ex.getClass()), ex);
         }
     }

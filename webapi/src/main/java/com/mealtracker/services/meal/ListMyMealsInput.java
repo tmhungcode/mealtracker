@@ -5,12 +5,14 @@ import com.mealtracker.validation.LocalDateFormat;
 import com.mealtracker.validation.LocalTimeFormat;
 import com.mealtracker.validation.ValueInList;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ListMyMealsInput extends SingleSortableColumnPageableParams {
 
     @LocalDateFormat

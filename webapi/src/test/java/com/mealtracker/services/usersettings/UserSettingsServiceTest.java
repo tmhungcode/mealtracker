@@ -3,21 +3,19 @@ package com.mealtracker.services.usersettings;
 import com.mealtracker.domains.User;
 import com.mealtracker.domains.UserSettings;
 import com.mealtracker.repositories.UserRepository;
-import com.mealtracker.services.usersettings.MySettingsInput;
-import com.mealtracker.services.usersettings.UserSettingsService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserSettingsServiceTest {
     @InjectMocks
     private UserSettingsService userSettingsService;
@@ -29,7 +27,7 @@ public class UserSettingsServiceTest {
     @Test
     public void getUserSettings_ExistingUser_ExpectUserSettingsReturned() {
         var user = userWithSettings(415);
-        when(userRepository.getOne(eq(user.getId()))).thenReturn(user);
+        when(userRepository.getReferenceById(eq(user.getId()))).thenReturn(user);
         var userSettings = userSettingsService.getUserSettings(user.getId());
 
         assertThat(userSettings).hasFieldOrPropertyWithValue("dailyCalorieLimit", 415);
@@ -39,7 +37,7 @@ public class UserSettingsServiceTest {
     public void updateUserSettings_RequestWithDailyCalorieLimit_ExpectCalorieLimitUpdated() {
         var request = updateSettingsRequest(1000);
         var user = userWithSettings(500);
-        when(userRepository.getOne(eq(user.getId()))).thenReturn(user);
+        when(userRepository.getReferenceById(eq(user.getId()))).thenReturn(user);
         when(userRepository.save(calorieLimit(1000))).thenReturn(user);
         var userSettings = userSettingsService.updateUserSettings(user.getId(), request);
 
@@ -51,7 +49,7 @@ public class UserSettingsServiceTest {
     public void updateUserSettings_RequestWithoutDailyCalorieLimit_ExpectCalorieLimitNotOverridden() {
         var request = updateSettingsRequest(null);
         var user = userWithSettings(400);
-        when(userRepository.getOne(eq(user.getId()))).thenReturn(user);
+        when(userRepository.getReferenceById(eq(user.getId()))).thenReturn(user);
         when(userRepository.save(calorieLimit(400))).thenReturn(user);
 
         var userSettings = userSettingsService.updateUserSettings(user.getId(), request);

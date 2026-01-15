@@ -2,9 +2,8 @@ package com.mealtracker.services.meal;
 
 import com.mealtracker.ValidatorProvider;
 import com.mealtracker.assertions.AppAssertions;
-import org.junit.Test;
-
-import javax.validation.Validator;
+import jakarta.validation.Validator;
+import org.junit.jupiter.api.Test;
 
 public class MyMealInputTest {
     private final Validator validator = ValidatorProvider.getValidator();

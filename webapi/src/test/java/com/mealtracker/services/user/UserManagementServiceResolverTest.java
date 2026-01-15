@@ -3,7 +3,7 @@ package com.mealtracker.services.user;
 import com.mealtracker.assertions.AppAssertions;
 import com.mealtracker.security.CurrentUser;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.mock;

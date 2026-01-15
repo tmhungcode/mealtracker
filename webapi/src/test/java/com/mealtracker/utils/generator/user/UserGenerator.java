@@ -19,6 +19,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserGenerator {
 
+    private final List<WritableUser> users = new LinkedList<>();
+    private final ClassPathFileWriter fileWriter = new ClassPathFileWriter();
+    private final ClassPathFileReader fileReader = new ClassPathFileReader();
+    private final UserGeneratorConfig config;
+    private ArrayList<String> fullNames;
+
+    private UserGenerator(UserGeneratorConfig config) {
+        this.config = config;
+    }
+
     public static void main(String[] args) {
         /**
          * With this config, we generate 396 users in total. Their ids starts from 100
@@ -39,19 +49,8 @@ public class UserGenerator {
 
     }
 
-    private final List<WritableUser> users = new LinkedList<>();
-    private final ClassPathFileWriter fileWriter = new ClassPathFileWriter();
-    private final ClassPathFileReader fileReader = new ClassPathFileReader();
-    private final UserGeneratorConfig config;
-
-    private ArrayList<String> fullNames;
-
     public static UserGenerator userGenerator(UserGeneratorConfig config) {
         return new UserGenerator(config);
-    }
-
-    private UserGenerator(UserGeneratorConfig config) {
-        this.config = config;
     }
 
     public void generate() {

@@ -5,12 +5,21 @@ target
 
 ### IntelliJ IDEA ###
 .idea
+.run
 *.iws
 *.iml
 *.ipr
 
+### VS Code ###
+.vscode/settings.json
+
 ### Others ###
 HELP.md
+.DS_Store
+
+### Logs ###
+logs/
+*.log
 
 ### Docker ###
 local-env/mysql/data

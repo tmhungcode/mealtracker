@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Import Spring Boot defaults -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Property for log pattern -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr([%15.15t]){faint} %clr([%X{correlationId}]){cyan} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <!-- Console Appender for local/development -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- JSON Console Appender for production -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>true</includeContext>
+            <includeMdc>true</includeMdc>
+            <includeStructuredArguments>true</includeStructuredArguments>
+            <includeTags>true</includeTags>
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <version>version</version>
+                <logger>logger</logger>
+                <thread>thread</thread>
+                <level>level</level>
+                <message>message</message>
+                <stackTrace>stack_trace</stackTrace>
+            </fieldNames>
+            <customFields>{"application":"mealtracker","service":"api"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- File Appender for local development (optional) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/mealtracker.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/mealtracker-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId}] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Async Appender for better performance -->
+    <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="JSON_CONSOLE"/>
+    </appender>
+
+    <!-- Local profile: Human-readable console + file -->
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+
+        <!-- Application-specific logging -->
+        <logger name="com.mealtracker" level="DEBUG"/>
+
+        <!-- Hibernate SQL logging (already in application-local.yml but can be here too) -->
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+        <!-- Spring Framework -->
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <logger name="org.springframework.security" level="DEBUG"/>
+
+        <!-- Reduce noise from libraries -->
+        <logger name="org.hibernate.engine.internal" level="WARN"/>
+        <logger name="org.hibernate.validator" level="WARN"/>
+        <logger name="org.apache.tomcat" level="INFO"/>
+    </springProfile>
+
+    <!-- Test profile: Minimal logging -->
+    <springProfile name="test">
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="com.mealtracker" level="INFO"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
+
+    <!-- Dev/Staging profile: JSON for log aggregation -->
+    <springProfile name="dev,staging">
+        <root level="INFO">
+            <appender-ref ref="ASYNC_JSON"/>
+        </root>
+
+        <logger name="com.mealtracker" level="DEBUG"/>
+        <logger name="org.springframework.security" level="INFO"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
+
+    <!-- Production profile: Structured JSON only -->
+    <springProfile name="prod">
+        <root level="WARN">
+            <appender-ref ref="ASYNC_JSON"/>
+        </root>
+
+        <!-- Application logging at INFO level -->
+        <logger name="com.mealtracker" level="INFO"/>
+
+        <!-- Critical Spring components -->
+        <logger name="org.springframework.boot" level="WARN"/>
+        <logger name="org.springframework.web" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+
+        <!-- Database - only errors in production -->
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.hibernate.SQL" level="WARN"/>
+
+        <!-- Connection pool -->
+        <logger name="com.zaxxer.hikari" level="WARN"/>
+
+        <!-- Flyway migrations -->
+        <logger name="org.flywaydb" level="INFO"/>
+    </springProfile>
+</configuration>
