@@ -2,56 +2,72 @@ package com.mealtracker.repositories;
 
 import com.mealtracker.domains.Meal;
 import com.mealtracker.domains.User;
-import org.assertj.core.api.Assertions;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-@Transactional
 @ActiveProfiles("test")
+@Testcontainers
+@Tag("integration")
+@Tag("repository")
 public class MealRepositoryIT {
 
-    @ClassRule
-    public static MySQLContainer mySQLContainer = AppDbContainer.getInstance();
-
+    @Container
+    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test")
+            .withEnv("TZ", "UTC");
     @Autowired
     private MealRepository mealRepository;
 
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url",
+                () -> mysql.getJdbcUrl() + "?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC");
+        registry.add("spring.datasource.username", mysql::getUsername);
+        registry.add("spring.datasource.password", mysql::getPassword);
+    }
+
     @Test
+    @Transactional
     @Sql("classpath:repositories/meal/insert_meal_1.sql")
     @Sql(scripts = "classpath:repositories/delete_meals.sql", executionPhase = AFTER_TEST_METHOD)
     public void softDelete_MealIdsOnly_ExpectMeals_MatchId_Deleted() {
         var mealIds = Arrays.asList(1L, 3L);
         mealRepository.softDelete(mealIds, null);
 
-        var meals = mealRepository.findAll();
+        var meals = StreamSupport.stream(mealRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
 
         assertThat(countDeletedMeals(meals)).describedAs("Number of meals returned").isEqualTo(2);
         assertThat(mealRepository.findById(2L).get().isDeleted()).isFalse();
     }
 
-
     @Test
+    @Transactional
     @Sql("classpath:repositories/meal/insert_meal_2.sql")
     @Sql(scripts = "classpath:repositories/delete_meals.sql", executionPhase = AFTER_TEST_METHOD)
     public void softDelete_MealIds_ConsumerId_ExpectMeals_MatchConsumerIdAndMealIds_Deleted() {
@@ -60,7 +76,8 @@ public class MealRepositoryIT {
         var mealIds = Arrays.asList(1L, 2L, notDeletedMealId);
         mealRepository.softDelete(mealIds, consumerId);
 
-        var meals = mealRepository.findAll();
+        var meals = StreamSupport.stream(mealRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
 
         assertThat(countDeletedMeals(meals)).isEqualTo(2);
         assertThat(mealRepository.findById(notDeletedMealId).get().isDeleted()).isFalse();
@@ -72,17 +89,19 @@ public class MealRepositoryIT {
     public void findExistingMeals_GivenConsumer_GivenDate_ExpectExistingMeals() {
         var consumer = new User();
         consumer.setId(1L);
-        var meals = mealRepository.findMealByConsumedDateAndConsumerAndDeleted(LocalDate.of(2018, 11, 5), consumer, false);
+        var meals = mealRepository.findMealByConsumedDateAndConsumerAndDeleted(LocalDate.of(2018, 11, 5), consumer,
+                false);
 
         assertThat(meals.size()).isEqualTo(1);
-        assertThat(meals.get(0).getName()).isEqualTo("user cake");
+        assertThat(meals.getFirst().getName()).isEqualTo("user cake");
     }
 
     @Test
     @Sql("classpath:repositories/meal/insert_meal_4.sql")
     @Sql(scripts = "classpath:repositories/delete_meals.sql", executionPhase = AFTER_TEST_METHOD)
     public void filterMyMeals_FromDate_ExpectMealsEqualOrAfterDateReturned() {
-        var meals = mealRepository.filterMyMeals(1L, LocalDate.of(2017, 2, 10), null, null, null, pageable()).getContent();
+        var meals = mealRepository.filterMyMeals(1L, LocalDate.of(2017, 2, 10), null, null, null, pageable())
+                .getContent();
         assertThat(name(meals)).containsExactlyInAnyOrder("eat on fromDate", "eat after fromDate");
     }
 
@@ -90,7 +109,8 @@ public class MealRepositoryIT {
     @Sql("classpath:repositories/meal/insert_meal_5.sql")
     @Sql(scripts = "classpath:repositories/delete_meals.sql", executionPhase = AFTER_TEST_METHOD)
     public void filterMyMeals_ToDate_ExpectMealsBeforeDateReturned() {
-        var meals = mealRepository.filterMyMeals(1L, null, LocalDate.of(2018, 9, 20), null, null, pageable()).getContent();
+        var meals = mealRepository.filterMyMeals(1L, null, LocalDate.of(2018, 9, 20), null, null, pageable())
+                .getContent();
         assertThat(name(meals)).containsExactlyInAnyOrder("eat before toDate");
     }
 
@@ -138,7 +158,7 @@ public class MealRepositoryIT {
     @Sql("classpath:repositories/meal/insert_meal_11.sql")
     @Sql(scripts = "classpath:repositories/delete_meals.sql", executionPhase = AFTER_TEST_METHOD)
     public void listExistingMeals_ExpectMealsReturnedWithOwnerDetails() {
-        var meal = mealRepository.listExistingMeals(pageable()).getContent().get(0);
+        var meal = mealRepository.listExistingMeals(pageable()).getContent().getFirst();
         assertThat(meal.getOwner())
                 .hasFieldOrPropertyWithValue("id", 1L)
                 .hasFieldOrPropertyWithValue("email", "listExistingUser_details@gmail.com")
@@ -177,7 +197,6 @@ public class MealRepositoryIT {
                 .hasFieldOrPropertyWithValue("fullName", "My Details");
     }
 
-
     long countDeletedMeals(List<Meal> meals) {
         return meals.stream().filter(Meal::isDeleted).count();
     }
@@ -185,7 +204,7 @@ public class MealRepositoryIT {
     List<String> name(List<Meal> meals) {
         return meals.stream().map(Meal::getName).collect(Collectors.toList());
     }
-    
+
     Pageable pageable() {
         return PageRequest.of(0, 1000);
     }

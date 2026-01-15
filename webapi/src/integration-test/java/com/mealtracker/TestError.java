@@ -33,6 +33,15 @@ public enum TestError {
         this.messageTemplate = messageTemplate;
     }
 
+    private static Map<Integer, Supplier<ResultMatcher>> buildStatusMatcherMapping() {
+        var mapping = new HashMap<Integer, Supplier<ResultMatcher>>();
+        mapping.put(400, () -> status().isBadRequest());
+        mapping.put(401, () -> status().isUnauthorized());
+        mapping.put(403, () -> status().isForbidden());
+        mapping.put(404, () -> status().isNotFound());
+        return mapping;
+    }
+
     public ResultMatcher json(Object... params) {
         Supplier<ResultMatcher> a = () -> status().isBadRequest();
 
@@ -51,15 +60,5 @@ public enum TestError {
 
     private int getHttpStatusCode() {
         return code / 100;
-    }
-
-
-    private static Map<Integer, Supplier<ResultMatcher>> buildStatusMatcherMapping() {
-        var mapping = new HashMap<Integer, Supplier<ResultMatcher>>();
-        mapping.put(400, () -> status().isBadRequest());
-        mapping.put(401, () -> status().isUnauthorized());
-        mapping.put(403, () -> status().isForbidden());
-        mapping.put(404, () -> status().isNotFound());
-        return mapping;
     }
 }

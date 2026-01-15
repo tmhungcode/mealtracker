@@ -5,18 +5,15 @@ import com.mealtracker.config.WebSecurityConfig;
 import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
 import com.mealtracker.exceptions.BadRequestAppException;
-import com.mealtracker.services.user.ManageUserInput;
-import com.mealtracker.services.user.PublicUserService;
-import com.mealtracker.services.user.RegisterUserInput;
-import com.mealtracker.services.user.UserManagementServiceResolver;
-import com.mealtracker.services.user.UserService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.mealtracker.services.user.*;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.mealtracker.TestError.AUTHORIZATION_API_ACCESS_DENIED;
@@ -29,21 +26,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = {PublicUserController.class, UserController.class})
-@ContextConfiguration(classes={MealTrackerApplication.class, WebSecurityConfig.class})
+@ContextConfiguration(classes = {MealTrackerApplication.class, WebSecurityConfig.class})
+@Tag("integration")
+@Tag("controller")
 public class PublicUserControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private PublicUserService publicUserService;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private UserManagementServiceResolver managementServiceResolver;
 
     /**
@@ -73,7 +72,8 @@ public class PublicUserControllerIT {
 
         mockMvc.perform(post("/v1/users").content(input))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'email','message':'size must be between 5 and 200'},{'name':'email','message':'must be a well-formed email address'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'email','message':'size must be between 5 and 200'},{'name':'email','message':'must be a well-formed email address'}]}}"));
     }
 
     @Test
@@ -84,7 +84,8 @@ public class PublicUserControllerIT {
 
         mockMvc.perform(post("/v1/users").content(input))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'fullName','message':'size must be between 5 and 200'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'fullName','message':'size must be between 5 and 200'}]}}"));
     }
 
     @Test
@@ -95,9 +96,9 @@ public class PublicUserControllerIT {
 
         mockMvc.perform(post("/v1/users").content(input))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'password','message':'size must be between 5 and 100'}]}}"));
+                .andExpect(content().json(
+                        "{'error':{'code':40000,'message':'Bad Input','errorFields':[{'name':'password','message':'size must be between 5 and 100'}]}}"));
     }
-
 
     @Test
     public void registerUser_ExistingEmail_ExpectError() throws Exception {
@@ -128,9 +129,8 @@ public class PublicUserControllerIT {
                 .andExpect(content().json("{'data':{'fullName':'Hello World','email':'hello@gmail.com'}}"));
     }
 
-
     RegisterUserInput registrationRequest() {
-        var request =  new RegisterUserInput();
+        var request = new RegisterUserInput();
         request.setEmail("superman@gmail.com");
         request.setFullName("Superman");
         request.setPassword("JusticeLeague");

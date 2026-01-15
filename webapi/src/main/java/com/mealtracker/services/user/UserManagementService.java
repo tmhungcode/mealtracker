@@ -8,6 +8,7 @@ public interface UserManagementService {
 
     /**
      * Check if the service can used by the current user
+     *
      * @param currentUser
      * @return
      */
@@ -15,12 +16,14 @@ public interface UserManagementService {
 
     /**
      * Add a new user
+     *
      * @param input
      */
     public void addUser(ManageUserInput input);
 
     /**
      * List users
+     *
      * @param input
      * @return
      */
@@ -28,6 +31,7 @@ public interface UserManagementService {
 
     /**
      * Lookup users by email
+     *
      * @param keyword
      * @param input
      * @return
@@ -36,6 +40,7 @@ public interface UserManagementService {
 
     /**
      * Perform soft delete users
+     *
      * @param input
      * @param currentUser
      */
@@ -43,6 +48,7 @@ public interface UserManagementService {
 
     /**
      * Get details of the given user's id
+     *
      * @param userId
      * @return
      */
@@ -51,6 +57,7 @@ public interface UserManagementService {
 
     /**
      * Update info for an existing user
+     *
      * @param userId
      * @param input
      * @return

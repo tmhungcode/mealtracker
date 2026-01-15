@@ -2,7 +2,6 @@ package com.mealtracker.services.session;
 
 import com.mealtracker.security.jwt.JwtTokenProvider;
 import com.mealtracker.services.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,18 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SessionService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+
+    public SessionService(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider,
+                          UserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
+    }
 
     public AccessToken generateToken(SessionInput sessionInput) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
-                sessionInput.getEmail(),
-                sessionInput.getPassword()
-        );
+                sessionInput.email(),
+                sessionInput.password());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         var token = jwtTokenProvider.generateToken(authentication);

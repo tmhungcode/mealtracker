@@ -1,10 +1,10 @@
 package com.mealtracker.security.jwt;
 
 import com.mealtracker.security.UserPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 public class JwtAuthenticationHandler {

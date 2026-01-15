@@ -4,14 +4,16 @@ import com.mealtracker.domains.Role;
 import com.mealtracker.domains.User;
 import com.mealtracker.exceptions.ResourceName;
 import com.mealtracker.exceptions.ResourceNotFoundAppException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PublicUserService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public PublicUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     public User registerUser(RegisterUserInput registrationInput) {
         var newUser = registrationInput.toUser();

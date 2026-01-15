@@ -5,21 +5,13 @@ import org.testcontainers.containers.MySQLContainer;
 
 @Slf4j
 public class AppDbContainer extends MySQLContainer<AppDbContainer> {
-    private static final String IMAGE_VERSION = "mysql:5.7";
-    private static final String JDBC_URL_TEMPLATE = "%s?useSSL=false&useTimezone=true&serverTimezone=UTC";
+    private static final String IMAGE_VERSION = "mysql:8.0";
+    private static final String JDBC_URL_TEMPLATE = "%s?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC";
     /**
      * A directory in the test classpath
      */
     private static final String MYSQL_CONF_DIRECTORY = "testcontainers-mysql";
     private static AppDbContainer container;
-
-    static class TestDbConfig {
-        static String DATABASE_NAME = "test";
-        static String MYSQL_USERNAME = "test";
-        static String MYSQL_PASSWORD = "test";
-        static String MYSQL_ROOT_USER = "root";
-        static String MYSQL_ROOT_PASSWORD = "root";
-    }
 
     private AppDbContainer() {
         super(IMAGE_VERSION);
@@ -34,13 +26,17 @@ public class AppDbContainer extends MySQLContainer<AppDbContainer> {
 
     @Override
     protected void configure() {
-        optionallyMapResourceParameterAsVolume("TC_MY_CNF", "/etc/mysql/conf.d", MYSQL_CONF_DIRECTORY);
+        // Map MySQL config if available
+        withCopyFileToContainer(
+                org.testcontainers.utility.MountableFile.forClasspathResource(MYSQL_CONF_DIRECTORY),
+                "/etc/mysql/conf.d/");
         addExposedPort(MYSQL_PORT);
         addEnv("MYSQL_DATABASE", TestDbConfig.DATABASE_NAME);
         addEnv("MYSQL_USER", TestDbConfig.MYSQL_USERNAME);
         addEnv("MYSQL_PASSWORD", TestDbConfig.MYSQL_PASSWORD);
-        addEnv("MYSQL_ROOT_PASSWORD", TestDbConfig.DATABASE_NAME);
         addEnv("MYSQL_ROOT_PASSWORD", TestDbConfig.MYSQL_ROOT_PASSWORD);
+        // Force UTC timezone for consistency
+        addEnv("TZ", "UTC");
         setStartupAttempts(3);
     }
 
@@ -57,6 +53,14 @@ public class AppDbContainer extends MySQLContainer<AppDbContainer> {
 
     @Override
     public void stop() {
-        //do nothing, JVM handles shut down
+        // do nothing, JVM handles shut down
+    }
+
+    static class TestDbConfig {
+        static String DATABASE_NAME = "test";
+        static String MYSQL_USERNAME = "test";
+        static String MYSQL_PASSWORD = "test";
+        static String MYSQL_ROOT_USER = "root";
+        static String MYSQL_ROOT_PASSWORD = "root";
     }
 }

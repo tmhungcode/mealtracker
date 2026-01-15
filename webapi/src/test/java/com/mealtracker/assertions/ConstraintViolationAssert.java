@@ -1,22 +1,14 @@
 package com.mealtracker.assertions;
 
+import jakarta.validation.ConstraintViolation;
 import org.assertj.core.api.AbstractAssert;
 
-import javax.validation.ConstraintViolation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.EMAIL_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.LOCAL_DATE_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.LOCAL_TIME_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.MAX_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.MIN_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.NOT_NULL;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.POSITIVE_OR_ZERO_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.SIZE_FORMAT;
-import static com.mealtracker.assertions.ConstraintViolationAssert.Message.VALUE_IN_LIST_FORMAT;
+import static com.mealtracker.assertions.ConstraintViolationAssert.Message.*;
 
 public class ConstraintViolationAssert<T> extends AbstractAssert<ConstraintViolationAssert<T>, Set<ConstraintViolation<T>>> {
 
@@ -69,6 +61,7 @@ public class ConstraintViolationAssert<T> extends AbstractAssert<ConstraintViola
         violate(fieldName, POSITIVE_OR_ZERO_FORMAT);
         return this;
     }
+
     public ConstraintViolationAssert<T> violateEmailFormat(String fieldName) {
         violate(fieldName, EMAIL_FORMAT);
         return this;

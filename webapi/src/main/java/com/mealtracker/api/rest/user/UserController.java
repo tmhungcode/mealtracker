@@ -14,20 +14,11 @@ import com.mealtracker.services.user.ManageUserInput;
 import com.mealtracker.services.user.UserManagementServiceResolver;
 import com.mealtracker.validation.OnAdd;
 import com.mealtracker.validation.OnUpdate;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Secured("USER_MANAGEMENT")
@@ -38,19 +29,20 @@ public class UserController {
 
     private final UserManagementServiceResolver serviceResolver;
 
-    @Autowired
     public UserController(UserManagementServiceResolver serviceResolver) {
         this.serviceResolver = serviceResolver;
     }
 
     @PostMapping
-    public SuccessEnvelop<MessageResponse> addUser(@Validated(OnAdd.class) @Valid @RequestBody ManageUserInput input, CurrentUser currentUser) {
+    public SuccessEnvelop<MessageResponse> addUser(@Validated(OnAdd.class) @Valid @RequestBody ManageUserInput input,
+                                                   CurrentUser currentUser) {
         serviceResolver.resolve(currentUser).addUser(input);
         return MessageResponse.of("User added successfully");
     }
 
     @GetMapping
-    public MetaSuccessEnvelop<List<ManageUserInfoResponse>, PaginationMeta> listUsers(@Valid ListUsersInput input, CurrentUser currentUser) {
+    public MetaSuccessEnvelop<List<ManageUserInfoResponse>, PaginationMeta> listUsers(@Valid ListUsersInput input,
+                                                                                      CurrentUser currentUser) {
         var userPage = serviceResolver.resolve(currentUser).listUsers(input);
         return ManageUserInfoResponse.envelop(userPage);
     }
@@ -64,7 +56,8 @@ public class UserController {
     }
 
     @DeleteMapping
-    public SuccessEnvelop<MessageResponse> deleteUsers(@Valid @RequestBody DeleteUsersInput input, CurrentUser currentUser) {
+    public SuccessEnvelop<MessageResponse> deleteUsers(@Valid @RequestBody DeleteUsersInput input,
+                                                       CurrentUser currentUser) {
         serviceResolver.resolve(currentUser).deleteUsers(input, currentUser);
         return MessageResponse.of("Users deleted successfully");
     }
@@ -75,11 +68,9 @@ public class UserController {
         return ManageUserInfoResponse.envelop(user);
     }
 
-
     @PutMapping("/{userId}")
     public SuccessEnvelop<MessageResponse> updateUser(@PathVariable long userId,
-                                                      @Validated(OnUpdate.class) @Valid
-                                                      @RequestBody ManageUserInput input,
+                                                      @Validated(OnUpdate.class) @Valid @RequestBody ManageUserInput input,
                                                       CurrentUser currentUser) {
         serviceResolver.resolve(currentUser).updateUser(userId, input);
         return MessageResponse.of("User updated successfully");

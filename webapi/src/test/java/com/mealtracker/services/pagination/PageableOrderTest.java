@@ -1,7 +1,7 @@
 package com.mealtracker.services.pagination;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 
 public class PageableOrderTest {

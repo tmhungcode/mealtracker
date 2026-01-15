@@ -16,6 +16,16 @@ import java.util.List;
 @Slf4j
 public class MealGenerator {
 
+    private final ClassPathFileReader fileReader = new ClassPathFileReader();
+    private final ClassPathFileWriter fileWriter = new ClassPathFileWriter();
+    private final ArrayList<String> dishNames = new ArrayList<>();
+    private final MealGeneratorConfig config;
+    private List<WritableMeal> meals = new LinkedList<>();
+
+    private MealGenerator(MealGeneratorConfig config) {
+        this.config = config;
+    }
+
     public static void main(String[] args) {
         var regularUserConfig = new ConsumerConfig(3, Diet.FOUR_TIMES, LocalDate.of(2019, 3, 1), LocalDate.of(2019, 5, 1), 70);
         var hungConfig = new ConsumerConfig(4, Diet.FIVE_TIMES, LocalDate.of(2019, 2, 1), LocalDate.of(2019, 5, 1), 100);
@@ -33,20 +43,9 @@ public class MealGenerator {
         mealGenerator(generatorConfig).generate();
     }
 
-    private final ClassPathFileReader fileReader = new ClassPathFileReader();
-    private final ClassPathFileWriter fileWriter = new ClassPathFileWriter();
-    private List<WritableMeal> meals = new LinkedList<>();
-    private final ArrayList<String> dishNames = new ArrayList<>();
-    private final MealGeneratorConfig config;
-
     public static MealGenerator mealGenerator(MealGeneratorConfig config) {
         return new MealGenerator(config);
     }
-
-    private MealGenerator(MealGeneratorConfig config) {
-        this.config = config;
-    }
-
 
     public void generate() {
         var consumerConfigs = config.getConsumerConfigs();
