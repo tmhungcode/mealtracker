@@ -1,8 +1,13 @@
 package com.mealtracker.security.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 
+import javax.crypto.SecretKey;
 import java.util.*;
 
 public class JwtTokenValidator {
@@ -13,10 +18,10 @@ public class JwtTokenValidator {
     private static final String BEARER_TOKEN_PREFIX = "Bearer ";
 
     private final Map<Class, String> exceptionMessageMapping;
-    private final String jwtSecretKey;
+    private final SecretKey secretKey;
 
-    public JwtTokenValidator(String jwtSecretKey) {
-        this.jwtSecretKey = jwtSecretKey;
+    public JwtTokenValidator(SecretKey secretKey) {
+        this.secretKey = secretKey;
         exceptionMessageMapping = new HashMap<>();
         exceptionMessageMapping.put(SignatureException.class, "Invalid JWT signature");
         exceptionMessageMapping.put(MalformedJwtException.class, "Invalid JWT token");
@@ -28,7 +33,7 @@ public class JwtTokenValidator {
 
     public void validate(String authToken) throws JwtValidationException {
         try {
-            Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(authToken);
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(authToken);
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
                  UnsupportedJwtException | IllegalArgumentException ex) {
             throw new JwtValidationException(exceptionMessageMapping.get(ex.getClass()), ex);

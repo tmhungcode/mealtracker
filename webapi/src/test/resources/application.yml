@@ -1,0 +1,14 @@
+spring:
+  main:
+    banner-mode: "off"
+  profiles:
+    active: test
+
+app:
+  jwt:
+    secretKey: JWTSuperSecretKeyThatIsLongEnoughForHS512AlgorithmRequiring512BitsMinimumLength!
+    expirationInMs: 604800000
+
+logging:
+  level:
+    com.mealtracker.security.jwt: DEBUG

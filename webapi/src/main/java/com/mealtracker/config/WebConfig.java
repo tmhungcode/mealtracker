@@ -3,7 +3,7 @@ package com.mealtracker.config;
 import com.mealtracker.config.rest.AuthenticatedMappingHandlerMapping;
 import com.mealtracker.config.rest.CurrentUserMethodArgumentResolver;
 import com.mealtracker.exceptions.ErrorIdGenerator;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcRegistrations;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

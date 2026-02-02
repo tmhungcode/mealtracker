@@ -7,8 +7,10 @@ import com.mealtracker.security.jwt.JwtAuthenticationFilter;
 import com.mealtracker.security.jwt.JwtAuthenticationHandler;
 import com.mealtracker.security.jwt.JwtTokenProvider;
 import com.mealtracker.security.jwt.JwtTokenValidator;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,9 +28,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableConfigurationProperties(JwtProperties.class)
 public class WebSecurityConfig {
 
     @Bean
@@ -43,13 +49,18 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JwtTokenProvider jwtTokenProvider(JwtProperties jwtProperties) {
-        return new JwtTokenProvider(jwtProperties.getSecretKey());
+    public SecretKey jwtSecretKey(JwtProperties jwtProperties) {
+        return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
     @Bean
-    public JwtTokenValidator jwtTokenValidator(JwtProperties jwtProperties) {
-        return new JwtTokenValidator(jwtProperties.getSecretKey());
+    public JwtTokenProvider jwtTokenProvider(SecretKey jwtSecretKey) {
+        return new JwtTokenProvider(jwtSecretKey);
+    }
+
+    @Bean
+    public JwtTokenValidator jwtTokenValidator(SecretKey jwtSecretKey) {
+        return new JwtTokenValidator(jwtSecretKey);
     }
 
     @Bean
@@ -66,8 +77,7 @@ public class WebSecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
                                                             PasswordEncoder passwordEncoder) {
-        var authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        var authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }

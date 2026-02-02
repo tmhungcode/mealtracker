@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -60,7 +60,7 @@ class MeControllerTest {
     void getMySettings_UserHasSettings_ExpectUserSettingsReturned() throws Exception {
         var userSettings = new UserSettings();
         userSettings.setDailyCalorieLimit(500);
-        when(userSettingsService.getUserSettings(USER.getId())).thenReturn(userSettings);
+        when(userSettingsService.getUserSettings(USER.id())).thenReturn(userSettings);
         mockMvc.perform(get("/v1/users/me").auth(USER))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data':{'dailyCalorieLimit':500}}"));
@@ -69,7 +69,7 @@ class MeControllerTest {
     @Test
     @DisplayName("Get my settings when user has no settings - Expect empty data")
     void getMySettings_UserHasNoSettings_ExpectEmptyDataReturned() throws Exception {
-        when(userSettingsService.getUserSettings(USER.getId())).thenReturn(null);
+        when(userSettingsService.getUserSettings(USER.id())).thenReturn(null);
         mockMvc.perform(get("/v1/users/me").auth(USER))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data':{}}"));

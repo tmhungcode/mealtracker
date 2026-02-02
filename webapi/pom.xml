@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mealtracker</groupId>
@@ -15,16 +15,15 @@
     <description>One stop solution to keep track of your meals</description>
 
     <properties>
-        <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
 
         <!-- Dependency versions -->
         <lombok.version>1.18.40</lombok.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <mockito.version>5.14.2</mockito.version>
-        <jjwt.version>0.9.1</jjwt.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jjwt.version>0.12.6</jjwt.version>
         <mysql-connector.version>8.4.0</mysql-connector.version>
         <build-helper-maven.version>3.1.0</build-helper-maven.version>
         <dockerfile-maven.version>1.4.13</dockerfile-maven.version>
@@ -49,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
         <!-- Actuator for monitoring and health checks -->
@@ -60,15 +59,20 @@
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
+            <artifactId>jjwt-api</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-
-        <!-- JAXB API for JWT (removed from Java 11+) -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${jaxb-api.version}</version>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -86,8 +90,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -104,6 +108,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -138,11 +147,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <jvmArguments>
-                        --add-opens=java.base/java.lang=ALL-UNNAMED
-                    </jvmArguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -183,9 +187,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <release>21</release>
+                    <source>25</source>
+                    <target>25</target>
+                    <release>25</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -207,7 +211,7 @@
                     <!-- Configure Mockito as Java agent to avoid dynamic loading warnings in Java 21+ -->
                     <argLine>
                         -Duser.timezone=UTC
-                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
                     </argLine>
                 </configuration>
             </plugin>

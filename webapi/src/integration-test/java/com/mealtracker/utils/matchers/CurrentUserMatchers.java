@@ -22,7 +22,7 @@ public class CurrentUserMatchers {
 
         @Override
         public boolean matches(CurrentUser actual) {
-            return expectedUser.getId() == actual.getId();
+            return expectedUser.id() == actual.getId();
         }
     }
 }

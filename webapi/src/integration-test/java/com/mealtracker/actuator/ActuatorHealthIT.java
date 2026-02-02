@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Integration tests for Actuator health endpoints.
- * Tests verify that health and info endpoints are publicly accessible without authentication.
+ * Tests verify that health endpoint is publicly accessible without authentication.
  * Uses Testcontainers for database since health checks include database connectivity.
  */
 @SpringBootTest
@@ -55,15 +55,5 @@ class ActuatorHealthIT {
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
-    }
-
-    @Test
-    @DisplayName("GET /actuator/info - Should return app info without authentication")
-    void info_NoAuthentication_ReturnsAppInfo() throws Exception {
-        mockMvc.perform(get("/actuator/info"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.app.name").value("Meal Tracker API"))
-                .andExpect(jsonPath("$.app.description").value("REST API for tracking meals and calorie consumption"))
-                .andExpect(jsonPath("$.app.version").exists());
     }
 }

@@ -1,9 +1,12 @@
 package com.mealtracker.security.jwt;
 
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -11,7 +14,8 @@ import static org.mockito.Mockito.when;
 public class JwtTokenValidatorTest {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private final JwtTokenValidator validator = new JwtTokenValidator("SecretKey");
+    private final JwtTokenValidator validator = new JwtTokenValidator(
+            Keys.hmacShaKeyFor("SecretKeyThatIsLongEnoughForHmacSHA512Algorithm1234567890".getBytes(StandardCharsets.UTF_8)));
 
     @Test
     public void extract_AuthorizationHeaderMissing_ExpectEmptyReturned() {

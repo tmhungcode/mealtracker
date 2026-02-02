@@ -33,7 +33,7 @@ public class AppRequestBuilder implements RequestBuilder {
     }
 
     public AppRequestBuilder auth(TestUser user) {
-        builder.header("Authorization", user.getToken());
+        builder.header("Authorization", user.token());
         return this;
     }
 

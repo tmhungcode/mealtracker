@@ -3,18 +3,17 @@ package com.mealtracker;
 import com.mealtracker.domains.Privilege;
 import com.mealtracker.domains.Role;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.Value;
+import io.jsonwebtoken.security.Keys;
 
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
 import static com.mealtracker.domains.Privilege.*;
 import static java.util.Arrays.asList;
 
-@Value
-public class TestUser {
+public record TestUser(long id, String email, String fullName, boolean enabled, Role role, List<Privilege> privileges,
+                       String token) {
 
     public static final TestUser ADMIN = TestUser.builder()
             .id(1L)
@@ -35,7 +34,7 @@ public class TestUser {
             .email("regular_user@gmail.com")
             .fullName("Regular User")
             .enabled(true)
-            .role(Role.REGULAR_USER).privileges(asList(MY_MEALS))
+            .role(Role.REGULAR_USER).privileges(List.of(MY_MEALS))
             .build();
     public static final TestUser NO_MY_MEAL = TestUser.builder()
             .id(4L)
@@ -63,22 +62,15 @@ public class TestUser {
             .email("only_user_management@gmail.com")
             .fullName("Only User Management")
             .enabled(true)
-            .role(Role.REGULAR_USER).privileges(Arrays.asList(USER_MANAGEMENT))
+            .role(Role.REGULAR_USER).privileges(List.of(USER_MANAGEMENT))
             .build();
-    private final long id;
-    private final String email;
-    private final String fullName;
-    private final boolean enabled;
-    private final Role role;
-    private final List<Privilege> privileges;
-    private final String token;
 
     static TestUserBuilder builder() {
         return new TestUserBuilder();
     }
 
     public static class TestUserBuilder {
-        private static final String TEST_JWT_SECRET_KEY = "JWTSuperSecretKey";
+        private static final String TEST_JWT_SECRET_KEY = "JWTSuperSecretKeyThatIsLongEnoughForHS512AlgorithmRequiring512BitsMinimumLength!";
         private static final String JWT_TOKEN_TEMPLATE = "Bearer %s";
         private long id;
         private String email;
@@ -90,32 +82,32 @@ public class TestUser {
         TestUserBuilder() {
         }
 
-        public TestUser.TestUserBuilder id(final long id) {
+        public TestUserBuilder id(final long id) {
             this.id = id;
             return this;
         }
 
-        public TestUser.TestUserBuilder email(final String email) {
+        public TestUserBuilder email(final String email) {
             this.email = email;
             return this;
         }
 
-        public TestUser.TestUserBuilder fullName(final String fullName) {
+        public TestUserBuilder fullName(final String fullName) {
             this.fullName = fullName;
             return this;
         }
 
-        public TestUser.TestUserBuilder enabled(final boolean enabled) {
+        public TestUserBuilder enabled(final boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public TestUser.TestUserBuilder role(final Role role) {
+        public TestUserBuilder role(final Role role) {
             this.role = role;
             return this;
         }
 
-        public TestUser.TestUserBuilder privileges(final List<Privilege> privileges) {
+        public TestUserBuilder privileges(final List<Privilege> privileges) {
             this.privileges = privileges;
             return this;
         }
@@ -127,9 +119,10 @@ public class TestUser {
             claims.put("role", role);
             claims.put("privileges", privileges);
             claims.put("fullName", fullName);
+            var secretKey = Keys.hmacShaKeyFor(TEST_JWT_SECRET_KEY.getBytes(StandardCharsets.UTF_8));
             var jwt = Jwts.builder()
-                    .setClaims(claims)
-                    .signWith(SignatureAlgorithm.HS512, TEST_JWT_SECRET_KEY)
+                    .claims().add(claims).and()
+                    .signWith(secretKey, Jwts.SIG.HS512)
                     .compact();
 
             return new TestUser(this.id, this.email, this.fullName, this.enabled, this.role, this.privileges, String.format(JWT_TOKEN_TEMPLATE, jwt));

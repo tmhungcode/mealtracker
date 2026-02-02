@@ -14,12 +14,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     properties:
       hibernate.create_empty_composites.enabled: true
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
 
 server:
   port: 9000
@@ -37,6 +33,9 @@ management:
     health:
       show-details: when-authorized
       show-components: when-authorized
+    info:
+      enabled: true
+      access: unrestricted
   info:
     env:
       enabled: true
@@ -54,5 +53,5 @@ info:
 
 app:
   jwt:
-    secretKey: JWTSuperSecretKey
+    secretKey: JWTSuperSecretKeyThatIsLongEnoughForHS512AlgorithmRequiring512BitsMinimumLength!
     expirationInMs: 604800000
